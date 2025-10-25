@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Furniture AR — Instant AR Camera</title>
+
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #f5f5f5;
+    }
+
+    header {
+      padding: 12px;
+      background: #f2f2f2;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 12px;
+      gap: 16px;
+    }
+
+    #viewer {
+      flex: 1;
+      min-height: 60vh;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* Furniture gallery */
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .category {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .thumbs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .thumb {
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      flex: 0 0 auto;
+      width: 100px;
+      height: 100px;
+      transition: transform 0.2s;
+      background: #fff;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb:hover {
+      transform: scale(1.05);
+    }
+
+    .thumbs::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .thumbs::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+
+    .thumbs::-webkit-scrollbar-track {
+      background: #f2f2f2;
+    }
+
+    /* Hidden model-viewer (used for AR only on mobile) */
+    model-viewer#hiddenAR {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <strong>Furniture AR — Tap furniture to place in your room</strong>
+    <div style="font-size:13px; color:#666;">Works on AR-supported mobile devices</div>
+  </header>
+
+  <main>
+    <div id="viewer">
+      <model-viewer id="mv"
+        src="thumbs/sofa1.glb"
+        alt="Furniture"
+        camera-controls
+        auto-rotate
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        ar-placement="floor"
+        shadow-intensity="1"
+        style="width:100%; height:100%;">
+      </model-viewer>
+    </div>
+
+    <aside class="gallery">
+
+      <!-- Sofas -->
+      <div class="category">Sofas</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/sofa1.glb" onclick="openAR(this)"><img src="thumbs/sofa1.png"></div>
+        <div class="thumb" data-model="thumbs/sofa2.glb" onclick="openAR(this)"><img src="thumbs/sofa2.png"></div>
+        <div class="thumb" data-model="thumbs/sofa3.glb" onclick="openAR(this)"><img src="thumbs/sofa3.png"></div>
+        <div class="thumb" data-model="thumbs/sofa4.glb" onclick="openAR(this)"><img src="thumbs/sofa4.png"></div>
+        <div class="thumb" data-model="thumbs/sofa5.glb" onclick="openAR(this)"><img src="thumbs/sofa5.png"></div>
+      </div>
+
+      <!-- Cupboards -->
+      <div class="category">Cupboards</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/cupboard1.glb" onclick="openAR(this)"><img src="thumbs/cupboard1.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard2.glb" onclick="openAR(this)"><img src="thumbs/cupboard2.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard3.glb" onclick="openAR(this)"><img src="thumbs/cupboard3.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard4.glb" onclick="openAR(this)"><img src="thumbs/cupboard4.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard5.glb" onclick="openAR(this)"><img src="thumbs/cupboard5.png"></div>
+      </div>
+
+      <!-- Dining Tables -->
+      <div class="category">Dining Tables</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/dining_table1.glb" onclick="openAR(this)"><img src="thumbs/dining_table1.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table2.glb" onclick="openAR(this)"><img src="thumbs/dining_table2.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table3.glb" onclick="openAR(this)"><img src="thumbs/dining_table3.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table4.glb" onclick="openAR(this)"><img src="thumbs/dining_table4.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table5.glb" onclick="openAR(this)"><img src="thumbs/dining_table5.png"></div>
+      </div>
+
+      <!-- Beds -->
+      <div class="category">Beds</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/bed1.glb" onclick="openAR(this)"><img src="thumbs/bed1.png"></div>
+        <div class="thumb" data-model="thumbs/bed2.glb" onclick="openAR(this)"><img src="thumbs/bed2.png"></div>
+        <div class="thumb" data-model="thumbs/bed3.glb" onclick="openAR(this)"><img src="thumbs/bed3.png"></div>
+        <div class="thumb" data-model="thumbs/bed4.glb" onclick="openAR(this)"><img src="thumbs/bed4.png"></div>
+        <div class="thumb" data-model="thumbs/bed5.glb" onclick="openAR(this)"><img src="thumbs/bed5.png"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Hidden model-viewer for instant AR trigger -->
+  <model-viewer id="hiddenAR"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-placement="floor"
+    shadow-intensity="1">
+  </model-viewer>
+
+  <script>
+    const mv = document.getElementById('mv');
+    const hiddenAR = document.getElementById('hiddenAR');
+
+    async function openAR(el) {
+      const model = el.dataset.model;
+      mv.src = model;
+      hiddenAR.src = model;
+
+      // For desktop: just update preview
+      if (!hiddenAR.canActivateAR) {
+        console.log("AR not available - showing in viewer only.");
+        return;
+      }
+
+      // For mobile: open AR instantly
+      hiddenAR.addEventListener('load', async () => {
+        try {
+          await hiddenAR.activateAR();
+        } catch (err) {
+          console.error("AR activation failed:", err);
+          alert("Could not start AR experience. Ensure your device supports AR and you allowed camera permission.");
+        }
+      }, { once: true });
+    }
+  </script>
+</body>
+</html>
