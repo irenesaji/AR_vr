@@ -40,7 +40,6 @@
       overflow: hidden;
     }
 
-    /* Furniture gallery */
     .gallery {
       display: flex;
       flex-direction: column;
@@ -96,7 +95,6 @@
       background: #f2f2f2;
     }
 
-    /* Hidden model-viewer (used for AR only on mobile) */
     model-viewer#hiddenAR {
       display: none;
     }
@@ -166,10 +164,59 @@
         <div class="thumb" data-model="thumbs/bed5.glb" onclick="openAR(this)"><img src="thumbs/bed5.png"></div>
       </div>
 
+      <!-- Chandeliers -->
+      <div class="category">Chandeliers</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/chandelier1.glb" onclick="openAR(this)"><img src="thumbs/chandelier1.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier2.glb" onclick="openAR(this)"><img src="thumbs/chandelier2.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier3.glb" onclick="openAR(this)"><img src="thumbs/chandelier3.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier4.glb" onclick="openAR(this)"><img src="thumbs/chandelier4.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier5.glb" onclick="openAR(this)"><img src="thumbs/chandelier5.png"></div>
+      </div>
+
+      <!-- Lamps -->
+      <div class="category">Lamps</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/lamp1.glb" onclick="openAR(this)"><img src="thumbs/lamp1.png"></div>
+        <div class="thumb" data-model="thumbs/lamp2.glb" onclick="openAR(this)"><img src="thumbs/lamp2.png"></div>
+        <div class="thumb" data-model="thumbs/lamp3.glb" onclick="openAR(this)"><img src="thumbs/lamp3.png"></div>
+        <div class="thumb" data-model="thumbs/lamp4.glb" onclick="openAR(this)"><img src="thumbs/lamp4.png"></div>
+        <div class="thumb" data-model="thumbs/lamp5.glb" onclick="openAR(this)"><img src="thumbs/lamp5.png"></div>
+      </div>
+
+      <!-- Mirrors -->
+      <div class="category">Mirrors</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/mirror1.glb" onclick="openAR(this)"><img src="thumbs/mirror1.png"></div>
+        <div class="thumb" data-model="thumbs/mirror2.glb" onclick="openAR(this)"><img src="thumbs/mirror2.png"></div>
+        <div class="thumb" data-model="thumbs/mirror3.glb" onclick="openAR(this)"><img src="thumbs/mirror3.png"></div>
+        <div class="thumb" data-model="thumbs/mirror4.glb" onclick="openAR(this)"><img src="thumbs/mirror4.png"></div>
+        <div class="thumb" data-model="thumbs/mirror5.glb" onclick="openAR(this)"><img src="thumbs/mirror5.png"></div>
+      </div>
+
+      <!-- Shelves -->
+      <div class="category">Shelves</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/shelf1.glb" onclick="openAR(this)"><img src="thumbs/shelf1.png"></div>
+        <div class="thumb" data-model="thumbs/shelf2.glb" onclick="openAR(this)"><img src="thumbs/shelf2.png"></div>
+        <div class="thumb" data-model="thumbs/shelf3.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
+        <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf4.png"></div>
+        <div class="thumb" data-model="thumbs/shelf5.glb" onclick="openAR(this)"><img src="thumbs/shelf5.png"></div>
+      </div>
+
+      <!-- Tables -->
+      <div class="category">Tables</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/table1.glb" onclick="openAR(this)"><img src="thumbs/table1.png"></div>
+        <div class="thumb" data-model="thumbs/table2.glb" onclick="openAR(this)"><img src="thumbs/table2.png"></div>
+        <div class="thumb" data-model="thumbs/table3.glb" onclick="openAR(this)"><img src="thumbs/table3.png"></div>
+        <div class="thumb" data-model="thumbs/table4.glb" onclick="openAR(this)"><img src="thumbs/table4.png"></div>
+        <div class="thumb" data-model="thumbs/table5.glb" onclick="openAR(this)"><img src="thumbs/table5.png"></div>
+      </div>
+
     </aside>
   </main>
 
-  <!-- Hidden model-viewer for instant AR trigger -->
   <model-viewer id="hiddenAR"
     ar
     ar-modes="webxr scene-viewer quick-look"
@@ -186,13 +233,11 @@
       mv.src = model;
       hiddenAR.src = model;
 
-      // For desktop: just update preview
       if (!hiddenAR.canActivateAR) {
         console.log("AR not available - showing in viewer only.");
         return;
       }
 
-      // For mobile: open AR instantly
       hiddenAR.addEventListener('load', async () => {
         try {
           await hiddenAR.activateAR();
