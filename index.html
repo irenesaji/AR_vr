@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AR-VR Experience — Furniture & Houses</title>
+
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    :root{
+      /* stronger light-blue base so the page is clearly blue */
+      --bg-start: #d9eefb; /* lighter blue */
+      --bg-end: #c7e9ff;   /* slightly deeper */
+      --card: #eaf8ff;
+      --muted: #35506a;
+      --accent: #1f7bff;
+      --viewer-dark: linear-gradient(180deg,#0c2a46 0%, #103a56 100%);
+      --glass: rgba(220,238,255,0.6);
+    }
+
+    html,body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: #0f172a;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      background-attachment: fixed;
+      padding: 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+  /* make header a light-blue glass so it reads blue on all screens */
+  background: rgba(200,230,255,0.26);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(15,23,42,0.04);
+      box-shadow: 0 2px 10px rgba(11,20,30,0.03);
+      border-radius: 0 0 12px 12px;
+      margin: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-left strong{
+      font-size: 18px;
+      color: #05203a;
+    }
+
+    .header-left div{
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      background: transparent;
+      font-weight: 600;
+      color: #08304a;
+      transition: transform .12s ease, box-shadow .12s ease;
+      box-shadow: none;
+    }
+
+    button:hover{ transform: translateY(-2px); box-shadow: 0 6px 18px rgba(43,124,255,0.12); }
+
+    button.active {
+      background: linear-gradient(90deg,var(--accent), #4aa3ff);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(43,124,255,0.18);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 16px;
+      gap: 18px;
+      margin: 0 12px 12px 12px;
+    }
+
+    #viewer {
+      flex: 1;
+      min-height: 60vh;
+      background: var(--viewer-dark);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(7,18,40,0.45);
+      border: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: stretch;
+    }
+
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+  /* make gallery clearly bluish */
+  background: linear-gradient(180deg, rgba(215,238,255,0.22), rgba(200,230,255,0.12));
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(10,25,40,0.02);
+    }
+
+    .category {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 15px;
+      color: #053049;
+    }
+
+    .thumbs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .thumb {
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+      flex: 0 0 auto;
+      width: 110px;
+      height: 84px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+  /* soft bluish card for thumbnails */
+  background: linear-gradient(180deg,#eaf8ff,#d7f0ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(9,30,63,0.06);
+      border: 1px solid rgba(11,20,30,0.03);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 14px 38px rgba(9,30,63,0.12);
+    }
+
+    .thumbs::-webkit-scrollbar { height: 8px; }
+    .thumbs::-webkit-scrollbar-thumb { background: rgba(11,20,30,0.08); border-radius: 6px; }
+    .thumbs::-webkit-scrollbar-track { background: transparent; }
+
+    model-viewer#hiddenAR { display: none; }
+    .hidden { display: none; }
+
+    @media (max-width:640px){
+      header{ padding: 12px; margin: 8px; }
+      .thumb{ width: 86px; height:70px }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-left">
+      <strong>AR-VR Experience</strong>
+      <div style="font-size:13px; color:#666;">Tap any model to view in your space</div>
+    </div>
+    <div class="header-right">
+      <button id="btnFurniture" class="active">AR-VR for Furniture</button>
+      <button id="btnHouses">AR-VR for Houses</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="viewer">
+      <model-viewer id="mv"
+        src="thumbs/sofa1.glb"
+        alt="Furniture"
+        camera-controls
+        auto-rotate
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        ar-placement="floor"
+        shadow-intensity="1"
+        style="width:100%; height:100%;">
+      </model-viewer>
+    </div>
+
+    <!-- FURNITURE GALLERY -->
+    <aside id="furnitureGallery" class="gallery">
+      <!-- Sofas -->
+      <div class="category">Sofas</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/sofa1.glb" onclick="openAR(this)"><img src="thumbs/sofa1.png"></div>
+        <div class="thumb" data-model="thumbs/sofa2.glb" onclick="openAR(this)"><img src="thumbs/sofa2.png"></div>
+        <div class="thumb" data-model="thumbs/sofa3.glb" onclick="openAR(this)"><img src="thumbs/sofa3.png"></div>
+        <div class="thumb" data-model="thumbs/sofa4.glb" onclick="openAR(this)"><img src="thumbs/sofa4.png"></div>
+        <div class="thumb" data-model="thumbs/sofa5.glb" onclick="openAR(this)"><img src="thumbs/sofa5.png"></div>
+      </div>
+
+      <!-- Cupboards -->
+      <div class="category">Cupboards</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/cupboard1.glb" onclick="openAR(this)"><img src="thumbs/cupboard1.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard2.glb" onclick="openAR(this)"><img src="thumbs/cupboard2.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard3.glb" onclick="openAR(this)"><img src="thumbs/cupboard3.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard4.glb" onclick="openAR(this)"><img src="thumbs/cupboard4.png"></div>
+        <div class="thumb" data-model="thumbs/cupboard5.glb" onclick="openAR(this)"><img src="thumbs/cupboard5.png"></div>
+      </div>
+
+      <!-- Dining Tables -->
+      <div class="category">Dining Tables</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/dining_table1.glb" onclick="openAR(this)"><img src="thumbs/dining_table1.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table2.glb" onclick="openAR(this)"><img src="thumbs/dining_table2.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table3.glb" onclick="openAR(this)"><img src="thumbs/dining_table3.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table4.glb" onclick="openAR(this)"><img src="thumbs/dining_table4.png"></div>
+        <div class="thumb" data-model="thumbs/dining_table5.glb" onclick="openAR(this)"><img src="thumbs/dining_table5.png"></div>
+      </div>
+
+      <!-- Beds -->
+      <div class="category">Beds</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/bed1.glb" onclick="openAR(this)"><img src="thumbs/bed1.png"></div>
+        <div class="thumb" data-model="thumbs/bed2.glb" onclick="openAR(this)"><img src="thumbs/bed2.png"></div>
+        <div class="thumb" data-model="thumbs/bed3.glb" onclick="openAR(this)"><img src="thumbs/bed3.png"></div>
+        <div class="thumb" data-model="thumbs/bed4.glb" onclick="openAR(this)"><img src="thumbs/bed4.png"></div>
+        <div class="thumb" data-model="thumbs/bed5.glb" onclick="openAR(this)"><img src="thumbs/bed5.png"></div>
+      </div>
+
+      <!-- Chandeliers -->
+      <div class="category">Chandeliers</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/chandelier1.glb" onclick="openAR(this)"><img src="thumbs/chandelier1.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier2.glb" onclick="openAR(this)"><img src="thumbs/chandelier2.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier3.glb" onclick="openAR(this)"><img src="thumbs/chandelier3.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier4.glb" onclick="openAR(this)"><img src="thumbs/chandelier4.png"></div>
+        <div class="thumb" data-model="thumbs/chandelier5.glb" onclick="openAR(this)"><img src="thumbs/chandelier5.png"></div>
+      </div>
+
+      <!-- Lamps -->
+      <div class="category">Lamps</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/lamp1.glb" onclick="openAR(this)"><img src="thumbs/lamp1.png"></div>
+        <div class="thumb" data-model="thumbs/lamp2.glb" onclick="openAR(this)"><img src="thumbs/lamp2.png"></div>
+        <div class="thumb" data-model="thumbs/lamp3.glb" onclick="openAR(this)"><img src="thumbs/lamp3.png"></div>
+        <div class="thumb" data-model="thumbs/lamp4.glb" onclick="openAR(this)"><img src="thumbs/lamp4.png"></div>
+        <div class="thumb" data-model="thumbs/lamp5.glb" onclick="openAR(this)"><img src="thumbs/lamp5.png"></div>
+      </div>
+
+      <!-- Mirrors -->
+      <div class="category">Mirrors</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/mirror1.glb" onclick="openAR(this)"><img src="thumbs/mirror1.png"></div>
+        <div class="thumb" data-model="thumbs/mirror2.glb" onclick="openAR(this)"><img src="thumbs/mirror2.png"></div>
+        <div class="thumb" data-model="thumbs/mirror3.glb" onclick="openAR(this)"><img src="thumbs/mirror3.png"></div>
+        <div class="thumb" data-model="thumbs/mirror4.glb" onclick="openAR(this)"><img src="thumbs/mirror4.png"></div>
+        <div class="thumb" data-model="thumbs/mirror5.glb" onclick="openAR(this)"><img src="thumbs/mirror5.png"></div>
+      </div>
+
+      <!-- Shelves -->
+      <div class="category">Shelves</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/shelf1.glb" onclick="openAR(this)"><img src="thumbs/shelf1.png"></div>
+        <div class="thumb" data-model="thumbs/shelf2.glb" onclick="openAR(this)"><img src="thumbs/shelf2.png"></div>
+        <div class="thumb" data-model="thumbs/shelf3.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
+        <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf4.png"></div>
+        <div class="thumb" data-model="thumbs/shelf5.glb" onclick="openAR(this)"><img src="thumbs/shelf5.png"></div>
+      </div>
+
+      <!-- Tables -->
+      <div class="category">Tables</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/table1.glb" onclick="openAR(this)"><img src="thumbs/table1.png"></div>
+        <div class="thumb" data-model="thumbs/table2.glb" onclick="openAR(this)"><img src="thumbs/table2.png"></div>
+        <div class="thumb" data-model="thumbs/table3.glb" onclick="openAR(this)"><img src="thumbs/table3.png"></div>
+        <div class="thumb" data-model="thumbs/table4.glb" onclick="openAR(this)"><img src="thumbs/table4.png"></div>
+        <div class="thumb" data-model="thumbs/table5.glb" onclick="openAR(this)"><img src="thumbs/table5.png"></div>
+      </div>
+    </aside>
+
+    <!-- HOUSES GALLERY -->
+    <aside id="housesGallery" class="gallery hidden">
+      <div class="category">Houses</div>
+      <div class="thumbs">
+        <div class="thumb" data-model="thumbs/house1.glb" onclick="openAR(this)"><img src="thumbs/house1.png" alt="1 Floor House"></div>
+        <div class="thumb" data-model="thumbs/house2.glb" onclick="openAR(this)"><img src="thumbs/house2.png" alt="2 Floor House"></div>
+        <div class="thumb" data-model="thumbs/house3.glb" onclick="openAR(this)"><img src="thumbs/house3.png" alt="3 Floor House"></div>
+      </div>
+    </aside>
+  </main>
+
+  <model-viewer id="hiddenAR"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-placement="floor"
+    shadow-intensity="1">
+  </model-viewer>
+
+  <script>
+    const mv = document.getElementById('mv');
+    const hiddenAR = document.getElementById('hiddenAR');
+    const btnFurniture = document.getElementById('btnFurniture');
+    const btnHouses = document.getElementById('btnHouses');
+    const furnitureGallery = document.getElementById('furnitureGallery');
+    const housesGallery = document.getElementById('housesGallery');
+
+    // Toggle between Furniture and Houses
+    btnFurniture.addEventListener('click', () => {
+      btnFurniture.classList.add('active');
+      btnHouses.classList.remove('active');
+      furnitureGallery.classList.remove('hidden');
+      housesGallery.classList.add('hidden');
+      mv.src = "thumbs/sofa1.glb";
+    });
+
+    btnHouses.addEventListener('click', () => {
+      btnHouses.classList.add('active');
+      btnFurniture.classList.remove('active');
+      furnitureGallery.classList.add('hidden');
+      housesGallery.classList.remove('hidden');
+      mv.src = "thumbs/house1.glb";
+    });
+
+    // AR handling
+    async function openAR(el) {
+      const model = el.dataset.model;
+      mv.src = model;
+      hiddenAR.src = model;
+
+      if (!hiddenAR.canActivateAR) {
+        console.log("AR not available - showing in viewer only.");
+        return;
+      }
+
+      hiddenAR.addEventListener('load', async () => {
+        try {
+          await hiddenAR.activateAR();
+        } catch (err) {
+          console.error("AR activation failed:", err);
+          alert("Could not start AR. Ensure your device supports AR and camera permission.");
+        }
+      }, { once: true });
+    }
+  </script>
+</body>
+</html>
