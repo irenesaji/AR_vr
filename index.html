@@ -192,7 +192,6 @@
     </div>
     <div class="header-right">
       <button id="btnFurniture" class="active">AR-VR for Furniture</button>
-      <button id="btnHouses">AR-VR for Houses</button>
     </div>
   </header>
 
@@ -288,7 +287,7 @@
       <div class="thumbs">
         <div class="thumb" data-model="thumbs/shelf1.glb" onclick="openAR(this)"><img src="thumbs/shelf1.png"></div>
         <div class="thumb" data-model="thumbs/shelf2.glb" onclick="openAR(this)"><img src="thumbs/shelf2.png"></div>
-        <div class="thumb" data-model="thumbs/shelf3.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
+        <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
         <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf4.png"></div>
         <div class="thumb" data-model="thumbs/shelf5.glb" onclick="openAR(this)"><img src="thumbs/shelf5.png"></div>
       </div>
@@ -304,15 +303,7 @@
       </div>
     </aside>
 
-    <!-- HOUSES GALLERY -->
-    <aside id="housesGallery" class="gallery hidden">
-      <div class="category">Houses</div>
-      <div class="thumbs">
-        <div class="thumb" data-model="thumbs/house1.glb" onclick="openAR(this)"><img src="thumbs/house1.png" alt="1 Floor House"></div>
-        <div class="thumb" data-model="thumbs/house2.glb" onclick="openAR(this)"><img src="thumbs/house2.png" alt="2 Floor House"></div>
-        <div class="thumb" data-model="thumbs/house3.glb" onclick="openAR(this)"><img src="thumbs/house3.png" alt="3 Floor House"></div>
-      </div>
-    </aside>
+    <!-- Houses gallery removed — site now focuses on Furniture only -->
   </main>
 
   <model-viewer id="hiddenAR"
@@ -326,47 +317,94 @@
     const mv = document.getElementById('mv');
     const hiddenAR = document.getElementById('hiddenAR');
     const btnFurniture = document.getElementById('btnFurniture');
-    const btnHouses = document.getElementById('btnHouses');
     const furnitureGallery = document.getElementById('furnitureGallery');
-    const housesGallery = document.getElementById('housesGallery');
 
-    // Toggle between Furniture and Houses
+    // Single mode: Furniture. Keep handler minimal and idempotent.
     btnFurniture.addEventListener('click', () => {
       btnFurniture.classList.add('active');
-      btnHouses.classList.remove('active');
       furnitureGallery.classList.remove('hidden');
-      housesGallery.classList.add('hidden');
       mv.src = "thumbs/sofa1.glb";
     });
 
-    btnHouses.addEventListener('click', () => {
-      btnHouses.classList.add('active');
-      btnFurniture.classList.remove('active');
-      furnitureGallery.classList.add('hidden');
-      housesGallery.classList.remove('hidden');
-      mv.src = "thumbs/house1.glb";
-    });
-
-    // AR handling
+    // AR handling — robust support check and error handling
     async function openAR(el) {
       const model = el.dataset.model;
       mv.src = model;
-      hiddenAR.src = model;
+      // set src via attribute (works reliably across browsers)
+      hiddenAR.setAttribute('src', model);
 
-      if (!hiddenAR.canActivateAR) {
-        console.log("AR not available - showing in viewer only.");
-        return;
-      }
-
-      hiddenAR.addEventListener('load', async () => {
-        try {
-          await hiddenAR.activateAR();
-        } catch (err) {
-          console.error("AR activation failed:", err);
-          alert("Could not start AR. Ensure your device supports AR and camera permission.");
+      try {
+        // If canActivateAR is a function (older/newer model-viewer versions), call it.
+        if (typeof hiddenAR.canActivateAR === 'function') {
+          const can = await hiddenAR.canActivateAR();
+          if (!can) {
+            console.log('AR not available - showing in viewer only.');
+            return;
+          }
+        } else if (hiddenAR.canActivateAR === false) {
+          // explicit false means not available
+          console.log('AR not available - showing in viewer only.');
+          return;
         }
-      }, { once: true });
+
+        // Wait for the model to load before attempting to activate AR.
+        await new Promise((resolve) => hiddenAR.addEventListener('load', resolve, { once: true }));
+
+        if (typeof hiddenAR.activateAR === 'function') {
+          await hiddenAR.activateAR();
+        } else {
+          // activateAR not available on this build — gracefully inform user
+          console.log('activateAR not supported by this model-viewer build.');
+          alert('AR is not supported on this device or by this browser.');
+        }
+      } catch (err) {
+        console.error('AR activation failed:', err);
+        // Keep the message user-friendly and actionable
+        alert('Could not start AR. Ensure your device supports AR and camera permission.');
+      }
     }
+  </script>
+
+  <!-- Error overlay: shows JS runtime errors on the page for easier debugging -->
+  <style>
+    #errorOverlay {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 420px;
+      background: rgba(15,23,42,0.92);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      display: none;
+      z-index: 9999;
+      line-height: 1.3;
+    }
+    #errorOverlay button { background: transparent; border: 0; color: #9ecbff; cursor: pointer; margin-left:8px }
+  </style>
+
+  <div id="errorOverlay" role="alert"></div>
+  <script>
+    const overlay = document.getElementById('errorOverlay');
+    function showError(msg) {
+      overlay.style.display = 'block';
+      overlay.textContent = msg;
+      const btn = document.createElement('button');
+      btn.textContent = 'Dismiss';
+      btn.onclick = () => overlay.style.display = 'none';
+      overlay.appendChild(btn);
+      console.error('Runtime error:', msg);
+    }
+
+    window.addEventListener('error', (ev) => {
+      showError(ev.message || String(ev.error) || 'Unknown error');
+    });
+
+    window.addEventListener('unhandledrejection', (ev) => {
+      showError(ev.reason ? (ev.reason.message || String(ev.reason)) : 'Unhandled promise rejection');
+    });
   </script>
 </body>
 </html>

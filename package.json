@@ -1,0 +1,11 @@
+{
+  "name": "ar-vr",
+  "version": "1.0.0",
+  "description": "Static AR/VR demo — serves index.html and assets",
+  "scripts": {
+    "dev": "npx http-server -c-1 -p 3000 -a 127.0.0.1",
+    "start": "npx http-server -c-1 -p 3000 -a 127.0.0.1"
+  },
+  "author": "",
+  "license": "MIT"
+}
