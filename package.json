@@ -1,0 +1,11 @@
+{
+  "name": "ar-vr",
+  "version": "1.0.0",
+  "description": "Simple static AR/VR model viewer",
+  "private": true,
+  "scripts": {
+    "dev": "npx http-server ./ -p 3000"
+
+
+  }
+}
