@@ -196,9 +196,12 @@
   </header>
 
   <main>
+    <div id="status" style="font-size:13px;color:#08304a;background:rgba(255,255,255,0.6);padding:8px 12px;border-radius:10px;border:1px solid rgba(11,20,30,0.08);">
+      Select an item to load its exact 3D model.
+    </div>
     <div id="viewer">
       <model-viewer id="mv"
-        src="thumbs/sofa1.glb"
+        src=""
         alt="Furniture"
         camera-controls
         auto-rotate
@@ -287,7 +290,7 @@
       <div class="thumbs">
         <div class="thumb" data-model="thumbs/shelf1.glb" onclick="openAR(this)"><img src="thumbs/shelf1.png"></div>
         <div class="thumb" data-model="thumbs/shelf2.glb" onclick="openAR(this)"><img src="thumbs/shelf2.png"></div>
-        <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
+        <div class="thumb" data-model="thumbs/shelf3.glb" onclick="openAR(this)"><img src="thumbs/shelf3.png"></div>
         <div class="thumb" data-model="thumbs/shelf4.glb" onclick="openAR(this)"><img src="thumbs/shelf4.png"></div>
         <div class="thumb" data-model="thumbs/shelf5.glb" onclick="openAR(this)"><img src="thumbs/shelf5.png"></div>
       </div>
@@ -318,20 +321,45 @@
     const hiddenAR = document.getElementById('hiddenAR');
     const btnFurniture = document.getElementById('btnFurniture');
     const furnitureGallery = document.getElementById('furnitureGallery');
+    const status = document.getElementById('status');
+
+    function setStatus(message, isError = false) {
+      status.textContent = message;
+      status.style.color = isError ? '#7a1328' : '#08304a';
+      status.style.borderColor = isError ? 'rgba(122,19,40,0.35)' : 'rgba(11,20,30,0.08)';
+      status.style.background = isError ? 'rgba(255,236,240,0.9)' : 'rgba(255,255,255,0.6)';
+    }
 
     // Single mode: Furniture. Keep handler minimal and idempotent.
     btnFurniture.addEventListener('click', () => {
       btnFurniture.classList.add('active');
       furnitureGallery.classList.remove('hidden');
-      mv.src = "thumbs/sofa1.glb";
+      mv.removeAttribute('src');
+      setStatus('Select an item to load its exact 3D model.');
     });
+
+    async function modelExists(modelPath) {
+      try {
+        const response = await fetch(modelPath, { method: 'HEAD' });
+        return response.ok;
+      } catch {
+        return false;
+      }
+    }
 
     // AR handling — robust support check and error handling
     async function openAR(el) {
       const model = el.dataset.model;
+      const exists = await modelExists(model);
+      if (!exists) {
+        setStatus(`3D model missing: ${model}. Add this .glb file to enable AR for this item.`, true);
+        return;
+      }
+
       mv.src = model;
       // set src via attribute (works reliably across browsers)
       hiddenAR.setAttribute('src', model);
+      setStatus(`Loaded ${model}. Use touch controls to move/rotate.`, false);
 
       try {
         // If canActivateAR is a function (older/newer model-viewer versions), call it.
@@ -355,14 +383,27 @@
         } else {
           // activateAR not available on this build — gracefully inform user
           console.log('activateAR not supported by this model-viewer build.');
-          alert('AR is not supported on this device or by this browser.');
+          setStatus('AR is not supported on this browser/device. 3D preview is still available here.', true);
         }
       } catch (err) {
         console.error('AR activation failed:', err);
         // Keep the message user-friendly and actionable
-        alert('Could not start AR. Ensure your device supports AR and camera permission.');
+        setStatus('Could not start AR. Ensure your mobile device supports AR and camera permission.', true);
       }
     }
+
+    (async function markMissingModels() {
+      const cards = Array.from(document.querySelectorAll('.thumb[data-model]'));
+      for (const card of cards) {
+        const model = card.dataset.model;
+        const exists = await modelExists(model);
+        if (!exists) {
+          card.style.opacity = '0.55';
+          card.style.outline = '2px dashed rgba(122,19,40,0.45)';
+          card.title = `${model} is missing`;
+        }
+      }
+    })();
   </script>
 
   <!-- Error overlay: shows JS runtime errors on the page for easier debugging -->
