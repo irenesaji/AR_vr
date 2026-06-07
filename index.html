@@ -177,6 +177,28 @@
     model-viewer#hiddenAR { display: none; }
     .hidden { display: none; }
 
+    /* Right-side back button */
+    .back-btn {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 999;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: linear-gradient(90deg,#1f7bff,#4aa3ff);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px 6px 6px 12px;
+      box-shadow: 0 8px 30px rgba(31,123,255,0.18);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .back-btn:hover { transform: translateY(-50%) translateX(-4px); box-shadow: 0 14px 40px rgba(31,123,255,0.22); }
+
     @media (max-width:640px){
       header{ padding: 12px; margin: 8px; }
       .thumb{ width: 86px; height:70px }
@@ -194,6 +216,9 @@
       <button id="btnFurniture" class="active">AR-VR for Furniture</button>
     </div>
   </header>
+
+  <!-- Right-side Back button to Dashboard -->
+  <a id="backBtn" class="back-btn" href="/dashboard" aria-label="Back to Dashboard">← Dashboard</a>
 
   <main>
     <div id="status" style="font-size:13px;color:#08304a;background:rgba(255,255,255,0.6);padding:8px 12px;border-radius:10px;border:1px solid rgba(11,20,30,0.08);">
