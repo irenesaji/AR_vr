@@ -218,7 +218,19 @@
   </header>
 
   <!-- Right-side Back button to Dashboard -->
-  <a id="backBtn" class="back-btn" href="/dashboard" aria-label="Back to Dashboard">← Dashboard</a>
+  <a id="backBtn" class="back-btn" href="javascript:void(0)" onclick="goBack()" aria-label="Back to Dashboard">← Dashboard</a>
+  <script>
+    function goBack() {
+      // Works on localhost AND any deployed domain
+      const origin = window.location.origin
+      // If opened from main app, go back; otherwise go to /dashboard
+      if (document.referrer && document.referrer.includes(window.location.hostname)) {
+        history.back()
+      } else {
+        window.location.href = origin + '/dashboard'
+      }
+    }
+  </script>
 
   <main>
     <div id="status" style="font-size:13px;color:#08304a;background:rgba(255,255,255,0.6);padding:8px 12px;border-radius:10px;border:1px solid rgba(11,20,30,0.08);">
